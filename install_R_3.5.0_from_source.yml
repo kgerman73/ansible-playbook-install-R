@@ -1,0 +1,121 @@
+---
+
+- name: Compile R from sources
+  hosts: all
+  vars:
+    R_version: R-3.5.0
+    R_tarball_url: "https://cran.r-project.org/src/base/R-3/{{ R_version }}.tar.gz"
+    R_install_dir: "/tmp/{{ R_version }}"
+    R_config_opts: "--prefix=/opt/R/{{ R_version }} --enable-R-shlib --enable-long-double --enable-java --enable-R-profiling --enable-memory-profiling --with-readline --with-blas --with-lapack --with-tcltk --with-libpng --with-cairo --with-jpeglib --with-libtiff --with-system-tre --with-internal-tzcode --with-recommended-packages --with-ICU --with-x=no --with-pic"
+
+  tasks:
+  - name: Installing R Dependencies for RHEL
+    become: yes
+    yum:
+      name: "{{ item }}"
+      update_cache: yes
+    with_items:
+      - cmake
+      - gcc
+      - gcc-c++
+      - gcc-gfortran
+      - bzip2
+      - bzip2-devel
+      - libcurl-devel
+      - openssl-devel
+      - libxml2-devel
+      - readline
+      - readline-devel
+      - texinfo
+      - texlive
+      - unzip
+      - wget
+      - java-1.8.0-openjdk
+      - java-1.8.0-openjdk-devel
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+  - name: Installing R Dependencies for SuSE
+    become: yes
+    zypper:
+      name: "{{ item }}"
+      update_cache: yes
+    with_items:
+      - cmake
+      - gcc
+      - gcc-c++
+      - gcc-fortran
+      - bzip2
+      - libbz2-devel
+      - libcurl-devel
+      - openssl-devel
+      - libxml2-devel
+      - pcre
+      - pcre-devel
+      - readline
+      - readline-devel
+      - texinfo
+      - texlive
+      - unzip
+      - wget
+      - java-1_8_0-openjdk
+      - java-1_8_0-openjdk-devel
+    when: ansible_distribution == 'SLES' or ansible_distribution == 'SuSE'
+
+  - name: Installing R Dependencies for Ubuntu
+    become: yes
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    with_items:
+      - cmake
+      - gcc
+      - g++
+      - gfortran
+      - bzip2
+      - libbz2-dev
+      - liblzma-dev
+      - libpcre3
+      - libpcre3-dev
+      - libcurl3
+      - libcurl4-openssl-dev
+      - libssl-dev
+      - libxml2-dev
+      - unzip
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Downloading R sources
+    get_url:
+      url: "{{ R_tarball_url }}"
+      dest: "/tmp/{{ R_version }}.tar.gz"
+    register: R_source
+
+  - name: Unpacking R
+    unarchive:
+      copy: no
+      dest: /tmp/
+      src: "{{ R_source.dest }}"
+    when: R_source.changed
+    register: R_source_unpack
+
+  - name: Create required R dirs
+    become: yes
+    file:
+      path: /opt/R
+      state: directory
+      owner: root
+      mode: 0755
+
+  - name: Configuring R source with custom modules
+    command: "./configure {{ R_config_opts }}"
+    args:
+      chdir: "{{ R_install_dir }}"
+    when: R_source_unpack.changed
+    register: R_configure
+
+  - name: Installing R
+    become: yes
+    shell: make && make install
+    args:
+      chdir: "{{ R_install_dir }}"
+    when: R_configure.changed
+

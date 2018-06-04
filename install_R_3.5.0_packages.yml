@@ -1,0 +1,17 @@
+---
+
+- name: Install R packages
+  hosts: all
+  vars:
+    R_version: R-3.5.0
+
+  tasks:
+  - name: Installing R packages
+    command: /opt/R/{{ R_version }}/bin/Rscript --slave --no-save --no-restore-history -e "install.packages('{{ item }}', repos='http://cran.revolutionanalytics.com/')"
+    with_items:
+      - rjson
+      - rPython
+      - plyr
+      - psych
+      - reshape2
+
