@@ -80,6 +80,7 @@
       - libcurl4-openssl-dev
       - libssl-dev
       - libxml2-dev
+      - libreadline-dev
       - unzip
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
