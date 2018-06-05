@@ -1,0 +1,33 @@
+---
+
+- name: Install R packages
+  hosts: all
+  vars_prompt:
+    - name: "R_version"
+      prompt: "Which R version are you installing packages for?"
+      default: R-3.5.0
+    - name: "R_lib"
+      prompt: "Where would you like to install the packages?"
+      default: /tmp/R/library
+  vars:
+    Rscript_opts: --slave --no-save --no-restore-history -e
+    Rscript_cmd: "install.packages('{{ item }}', repos='http://cran.revolutionanalytics.com/', lib='/tmp/R/library')"
+
+  tasks:
+  - name: Create required R dirs
+    become: yes
+    file:
+      path: "{{ R_lib }}"
+      state: directory
+      owner: root
+      mode: 0755
+
+  - name: Installing R packages
+    command: /opt/R/{{ R_version }}/bin/Rscript {{ Rscript_opts }} "{{ Rscript_cmd }}"
+    with_items:
+      - rjson
+      - rPython
+      - plyr
+      - psych
+      - reshape2
+
