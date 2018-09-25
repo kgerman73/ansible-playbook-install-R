@@ -24,6 +24,8 @@
       - libcurl-devel
       - openssl-devel
       - libxml2-devel
+      - pcre
+      - pcre-devel
       - readline
       - readline-devel
       - texinfo
