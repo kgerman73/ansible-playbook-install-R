@@ -6,7 +6,7 @@
     R_version: R-3.5.1
     R_tarball_url: "https://cran.r-project.org/src/base/R-3/{{ R_version }}.tar.gz"
     R_install_dir: "/tmp/{{ R_version }}"
-    R_config_opts: "--prefix=/tak/tbos/app/r/{{ R_version }} --enable-R-shlib --enable-long-double --enable-java --enable-R-profiling --enable-memory-profiling --with-readline --with-blas --with-lapack --with-tcltk --with-libpng --with-cairo --with-jpeglib --with-libtiff --with-system-tre --with-internal-tzcode --with-recommended-packages --with-ICU --with-x=no --with-pic"
+    R_config_opts: "--prefix=/opt/R/{{ R_version }} --enable-R-shlib --enable-long-double --enable-java --enable-R-profiling --enable-memory-profiling --with-readline --with-blas --with-lapack --with-tcltk --with-libpng --with-cairo --with-jpeglib --with-libtiff --with-system-tre --with-internal-tzcode --with-recommended-packages --with-ICU --with-x=no --with-pic"
 
   tasks:
   - name: Installing R Dependencies for RHEL
@@ -103,7 +103,7 @@
   - name: Create required R dirs
     become: yes
     file:
-      path: /tak/tbos/app/r/
+      path: /opt/R/
       state: directory
       owner: root
       mode: 0755
