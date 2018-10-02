@@ -14,7 +14,7 @@
 
   - name: install sssd.conf
     template:
-      src: /tmp/sssd.conf.j2
+      src: files/sssd.conf.j2
       dest: /etc/sssd/sssd.conf
       owner: root
       group: root
@@ -30,7 +30,7 @@
 
   - name: pem certificates
     template:
-      src: /tmp/TBOS.onetakeda.com.pem.j2
+      src: files/TBOS.onetakeda.com.pem.j2
       dest: /etc/openldap/cacerts/TBOS.onetakeda.com.pem
       owner: root
       group: root
@@ -41,3 +41,10 @@
       name: sssd
       state: started
 
+  - name: update sshd_config
+    shell: "sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
+
+  - name: restart sshd
+    service:
+      name: sshd
+      state: restarted
