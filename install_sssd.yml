@@ -48,3 +48,6 @@
     service:
       name: sshd
       state: restarted
+
+  - name: enable sssd logins
+    shell: "authconfig --enablesssd --enablesssdauth --enablelocauthorize --enablemkhomedir --update"
