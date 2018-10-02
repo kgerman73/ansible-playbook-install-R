@@ -1,0 +1,22 @@
+---
+
+- name: Install RStudio Server
+  hosts: all
+  vars:
+    R_version: R-3.5.1
+    RStudio_url: "https://download2.rstudio.org/rstudio-server-rhel-pro-1.1.456-x86_64.rpm"
+    RStudio_rpm: "rstudio-server-rhel-pro-1.1.456-x86_64.rpm"
+###    R_install_dir: "/tmp/{{ R_version }}"
+
+  tasks:
+  - name: Downloading RStudio
+    get_url:
+      url: "{{ RStudio_url }}"
+      dest: "/tmp/{{ RStudio_rpm }}"
+
+  - name: Installing RStudio Server RPM
+    become: yes
+    yum:
+      name: "/tmp/{{ RStudio_rpm }}"
+      update_cache: yes
+

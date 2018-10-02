@@ -1,0 +1,43 @@
+---
+
+- name: Install and Configure SSSD
+  hosts: all
+
+  tasks:
+  - name: install sssd
+    yum: name={{ item }} state=present
+    with_items:
+      - sssd
+      - sssd-tools
+      - sssd-ldap
+      - openldap-clients
+
+  - name: install sssd.conf
+    template:
+      src: /tmp/sssd.conf.j2
+      dest: /etc/sssd/sssd.conf
+      owner: root
+      group: root
+      mode: 0600
+
+  - name: create required cert dir
+    become: yes
+    file:
+      path: /etc/openldap/cacerts/
+      state: directory
+      owner: root
+      mode: 0755
+
+  - name: pem certificates
+    template:
+      src: /tmp/TBOS.onetakeda.com.pem.j2
+      dest: /etc/openldap/cacerts/TBOS.onetakeda.com.pem
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: Start service sssd, if not running
+    service:
+      name: sssd
+      state: started
+
